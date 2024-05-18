@@ -6,6 +6,8 @@ import Home from "../Pages/Home/Home";
 import OurMenu from "../Pages/OurMenu/OurMenu";
 import OruShop from "../Pages/Ourshop/OruShop";
 import Login from "../Pages/Login/Login";
+import Register from "../Pages/Register/Register";
+import PrivateRoute from "./PrivateRoute";
 
 
   const router = createBrowserRouter([
@@ -23,7 +25,7 @@ import Login from "../Pages/Login/Login";
         },
         {
           path:'ourshop',
-          element:<OruShop/>
+          element:<PrivateRoute><OruShop/></PrivateRoute>
         }
 
       ]
@@ -31,6 +33,10 @@ import Login from "../Pages/Login/Login";
     {
       path:'/login',
       element:<Login/>
+    },
+    {
+      path:'/registation',
+      element:<Register/>
     }
     
   ]);

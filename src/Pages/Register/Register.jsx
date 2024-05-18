@@ -1,107 +1,103 @@
 import { Link, useNavigate } from "react-router-dom";
 import loginimage from "../../assets/others/authentication1.png";
-import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
-import { useContext, useEffect, useRef, useState } from "react";
+
+import { useForm } from "react-hook-form";
+import { useContext } from "react";
 import { AuthContext } from "../../Provider/AuthProvider";
-const Login = () => {
-    const {login,googleLogin}=useContext(AuthContext) 
+
+const Register = () => {
     const navigate=useNavigate()
-    const captchaRef=useRef(null)
-    const [disabled,setdisabled]=useState(true)
-    useEffect(()=>{
-        loadCaptchaEnginge(6); 
-    },[])
-  const handlelogin = (e) => {
-   
-    e.preventDefault();
-    const form = e.target;
-    const name = form.name.value;
-    const email = form.email.value;
-    const password = form.password.value;
-    //login
-    login(email,password)
-    .then(result=>{
-      console.log(result)
-      navigate('/')
-    })
-    .catch(err=>{
-      console.log(err.message)
-    })
+    const {createuser,logOut}=useContext(AuthContext)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
+  const onSubmit = (data) => {
+    createuser(data.email,data.password)
+    .then(result=>{
+        logOut()
+        navigate('/login')
+        console.log(result)
+    })
   };
-
-  const handleCaptcha=()=>{
-    const value =captchaRef.current.value
-    if(validateCaptcha(value)){
-        setdisabled(false)
-        alert('captcha verifyed')
-       }
-       else{
-        setdisabled(true)
-        alert('oops!')
-       }
-  }
-  const handleGoogleLogin=()=>{
-    googleLogin()
-    .then(result=>{
-      console.log(result)
-      navigate('/')
-    })
-    .catch(err=>{
-      console.log(err)
-    })
-  }
   return (
     <div className="">
-      <div className="flex lg:flex-row md:flex-row flex-col mx-auto justify-center items-center  mt-4 gap-8">
+      <div className="flex  lg:flex-row-reverse md:flex-row-reverse flex-col mx-auto justify-center items-center  mt-4 gap-8">
         <div className="w-1/2">
           <img src={loginimage} alt="" />
         </div>
-        <div className="lg:w-2/3 md:w-2/3">
-          <section className="  dark:bg-gray-900">
-            <div className="container  flex items-center justify-start min-h-screen px-6 mx-auto ">
-              <form onSubmit={handlelogin} className="w-full max-w-md ">
+        <div className="w-1/2">
+          <section className=" dark:bg-gray-900">
+            <div className="container flex items-center justify-end min-h-screen px-6 mx-auto ">
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="w-full max-w-md "
+              >
                 <h1 className="mt-3 text-center text-2xl font-semibold  capitalize sm:text-3xl dark:text-white">
-                  Login
+                  Sign Up
                 </h1>
+                <label>Name </label>
+
+                <input
+                  type="text"
+                  {...register("name", {
+                    required: true,
+                    maxLength: 20,
+                    minLength: 3,
+                  })}
+                  name="name"
+                  className="block w-full p-3 mt-1  border rounded-lg  dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+                  placeholder="Your Name"
+                />
+                {errors.name && (
+                  <span className="text-red-500">Name is required</span>
+                )}
+                <br />
                 <label>Email </label>
 
                 <input
                   type="email"
+                  {...register("email", { required: true })}
                   name="email"
                   className="block w-full p-3 mt-1  border rounded-lg  dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                   placeholder="Email address"
-                  //   {...register("email", { required: true })}
                 />
 
-                {/* {errors.email && (
-                <span className="text-red-500">This field is required</span>
-              )} */}
-
+                {errors.email && (
+                  <span className="text-red-500">This field is required</span>
+                )}
+                <br />
                 <label>Password</label>
                 <input
                   type="password"
+                  {...register("password", {
+                    required: true,
+                    maxLength: 20,
+                    minLength: 6,
+                    pattern:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/
+                  })}
                   name="password"
                   className="block w-full p-3    border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                   placeholder="Password"
-                  //   {...register("password", { required: true })}
                 />
+                {errors.password?.type === "required" && (
+                  <p className="text-red-600">password is required</p>
+                )}
+                {errors.password?.type === "minLength" && (
+                  <p className="text-red-600">password must be 6 charecter</p>
+                )}
+                {errors.password?.type === "maxLength" && (
+                  <p className="text-red-600">password must be up to 6 and les then 20 charecter</p>
+                )}
+                {errors.password?.type === "pattern" && (
+                  <p className="text-red-600">Weak Password</p>
+                )}
                 <br />
-                {/* {errors.password && (
-                <span className="text-red-500">This field is required</span>
-              )} */}
-                 <LoadCanvasTemplate />
-              
-                <input ref={captchaRef}
-                  type="text"
-                  name="captcha"
-                  className="block w-full p-3    border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                  placeholder="Type the Captcha"
-                  //   {...register("password", { required: true })}
-                />
-                <button onClick={handleCaptcha} className="btn btn-xs mt-2">Valid you captcha</button>
+
                 <div className="mt-6">
-                  <button disabled={disabled} className="w-full disabled:bg-gray-300 px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-[#D1A054] rounded-lg hover:bg-[#D1A054] focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                  <button className="w-full disabled:bg-gray-300 px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-[#D1A054] rounded-lg hover:bg-[#D1A054] focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                     Sign in
                   </button>
 
@@ -132,7 +128,7 @@ const Login = () => {
                       />
                     </svg>
 
-                    <span onClick={handleGoogleLogin} className="mx-2">Sign in with Google</span>
+                    <span className="mx-2">Sign in with Google</span>
                   </button>
 
                   <div className="mt-6 text-center ">
@@ -141,7 +137,7 @@ const Login = () => {
                       className="text-sm text-blue-500 hover:underline dark:text-blue-400"
                     >
                       Don’t have an account yet?
-                      <Link to={"/registation"}> Sign up</Link>
+                      <Link to={"/login"}> Sign In</Link>
                     </a>
                   </div>
                 </div>
@@ -154,4 +150,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
